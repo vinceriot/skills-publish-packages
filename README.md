@@ -14,76 +14,102 @@ _Use GitHub Actions to publish your project to a Docker image._
 </header>
 
 <!--
-  <<< Author notes: Step 1 >>>
-  Choose 3-5 steps for your course.
-  The first step is always the hardest, so pick something easy!
-  Link to docs.github.com for further explanations.
-  Encourage users to open new tabs for steps!
+  <<< Author notes: Step 4 >>>
+  Start this step by acknowledging the previous step.
+  Define terms and link to docs.github.com.
 -->
 
-## Step 1: Create the workflow file
+## Step 4: Pull your image
 
-_Welcome to "Publish packages"! :wave:_
+_Now things are running! :sparkles:_
 
-First, take a moment to examine the image below. It shows the relationship between _continuous integration_, _continuous delivery_ and _continuous deployment_.
+Whoa, now things are running! This may take a few minutes. This might take a tiny amount of time, so grab your popcorn :popcorn: and wait for the build to finish before moving on.
 
-![](https://i.imgur.com/xZCkjmU.png)
+To pull the Docker image, we need to log into Docker first.
 
-**Continuous integration** (CI) is a practice where developers integrate tested code into a shared branch several times per day. **Continuous delivery** (CD) is the next phase of **continuous integration** (CI) where we also make sure to package the code in a _release_ and store it somewhere - preferably, in an artifact repository. Lastly, **Continuous deployment** (CD) takes **continuous delivery** (CD) to the next level by directly deploying our releases to the world.
+Before we can use this Docker image, you will need to generate a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) that contains the following permissions:
 
-[**Docker**](https://www.docker.com/why-docker) is an engine that allows you to run containers.
-Containers are packages of software that can run reliably in different environments. Containers include everything needed to run the application. Containers are lightweight in comparison to virtual machines. A **Dockerfile** is a text document that contains all the commands and instructions necessary to build a Docker Image. A **Docker image** is an executable package comprised of code, dependencies, libraries, a runtime, environment variables, and configuration files. A **Docker container** is a runtime instance of a Docker Image.
+- repo (all)
+- write:packages
+- read:packages
 
-We'll start by creating the workflow file to publish a Docker image to GitHub Packages.
+![screenshot personal access token creation page with boxes for repo (all), write:packages, and read:packages checked](https://user-images.githubusercontent.com/3250463/219254714-82bb1da5-33b1-491b-97c0-b25f51494f6a.png)
 
-### :keyboard: Activity: Create the workflow file
+We will use this token to log in to Docker, and authenticate with the package.
 
-1. Open a new browser tab, and work on the steps in your second tab while you read the instructions in this tab.
-1. Navigate to the **Code** tab.
-1. From the **main** branch dropdown, click on the **cd** branch.
-1. Navigate to the `.github/workflows/` folder, then select **Add file** and click on **Create new file**.
-1. In the **Name your file...** field, enter `publish.yml`.
-1. Add the following to the `publish.yml` file:
-   ```yml
-   name: Publish to Docker
-   on:
-     push:
-       branches:
-         - main
-   permissions:
-     packages: write
-     contents: read
-   jobs:
-     publish:
-       runs-on: ubuntu-latest
-       steps:
-         - name: Checkout
-           uses: actions/checkout@v4
-         # Add your test steps here if needed...
-         - name: Docker meta
-           id: meta
-           uses: docker/metadata-action@v5
-           with:
-             images: ghcr.io/YOURNAME/publish-packages/game
-             tags: type=sha
-         - name: Login to GHCR
-           uses: docker/login-action@v3
-           with:
-             registry: ghcr.io
-             username: ${{ github.repository_owner }}
-             password: ${{ secrets.GITHUB_TOKEN }}
-         - name: Build container
-           uses: docker/build-push-action@v5
-           with:
-             context: .
-             push: true
-             tags: ${{ steps.meta.outputs.tags }}
+1. Open your terminal (Bash or Git Bash recommended).
+1. Use the following command to log in:
+   ```bash
+   docker login ghcr.io -u USERNAME
    ```
-1. Replace `YOURNAME` with your username.
-1. Make sure that the image name is unique.
-1. Commit your changes.
-1. (optional) Create a pull request to view all the changes you'll make throughout this course. Click the **Pull Requests** tab, click **New pull request**, set `base: main` and `compare:cd`.
-1. Wait about 20 seconds then refresh this page (the one you're following instructions from). [GitHub Actions](https://docs.github.com/en/actions) will automatically update to the next step.
+1. Replace `USERNAME` with your GitHub username.
+1. Enter your new Personal Access Token as the password.
+1. Press **Enter**.
+
+If everything went well, :crossed_fingers: you should see `Login Succeeded` in your terminal.
+
+### :keyboard: Activity: Pull your image
+
+1. Copy and paste the `pull` command from the package instructions into your terminal. It should look something like this:
+   - `docker pull ghcr.io/YOURNAME/publish-packages/game:TAG`
+     ![screenshot of the pull command on the GitHub package page](https://user-images.githubusercontent.com/3250463/219254981-9ff949fa-4d01-46e3-9e3d-b8ce3710c2a9.png)
+   - _Tip: To reach this page, click the **Code** tab at the top of your repository. Then, find the navigation bar below the repository description, and click the **Packages** heading link_
+1. Replace `YOURNAME` with your GitHub username.
+1. Replace `TAG` with the image tag.
+1. Press **Enter**.
+1. You should see output indicating that the pull was successful, like `Status: Downloaded newer image for ghcr.io/YOURNAME/publish-packages/game:TAG`.
+   ![screenshot of successful Docker image output](https://user-images.githubusercontent.com/3250463/219255178-3c943a6f-6c15-4f59-9002-228249b1c469.png)
+1. _We can't automatically verify this step for you, so please continue on to the next step below!_
+<!--
+  <<< Author notes: Step 5 >>>
+  Start this step by acknowledging the previous step.
+  Define terms and link to docs.github.com.
+-->
+
+## Step 5: Run your image
+
+_Nicely done grabbing your Docker image! :relaxed:_
+
+Let's trying running it.
+
+### :keyboard: Activity: Run your image
+
+1. Find your image information by typing `docker image ls`.
+   ![screenshot of output from Docker image ls command: lists docker images, REPOSITORY TAG and docker URL](https://i.imgur.com/UAwRXiq.png)<!-- This screenshot should be changed. -->
+1. Use the following command to run a container from your image:
+   ```bash
+   docker run -dp 8080:80 --rm <YOUR_IMAGE_NAME:TAG>
+   ```
+1. Replace `YOUR_IMAGE_NAME` with your image name under the `REPOSITORY` column.
+1. Replace `TAG` with the image tag under the `TAG` column.
+1. Press **Enter**.
+1. If everything went well, you will see hash value as output on your screen.
+1. Optionally, you can open [localhost:8080](http://localhost:8080) to see the page you just created.
+1. _We can't automatically verify this step for you, so please continue on to the next step below!_
+<!--
+  <<< Author notes: Finish >>>
+  Review what we learned, ask for feedback, provide next steps.
+-->
+
+## Finish
+
+_Congratulations friend, you've completed this course!_
+
+<img src=https://octodex.github.com/images/collabocats.jpg alt=celebrate width=300 align=right>
+
+Here's a recap of all the tasks you've accomplished in your repository:
+
+- You wrote a workflow that sends a code through a continuous delivery pipeline.
+- You built a fully deployable artifact.
+- You did so using GitHub Actions and GitHub Packages!
+
+### What's next?
+
+- Publish your own packages from your projects.
+- We'd love to hear what you thought of this course [in our discussion board](https://github.com/orgs/skills/discussions/categories/publish-packages).
+- [Take another GitHub Skills course](https://github.com/skills).
+- [Read the GitHub Getting Started docs](https://docs.github.com/en/get-started).
+- To find projects to contribute to, check out [GitHub Explore](https://github.com/explore).
 
 <footer>
 
@@ -99,3 +125,4 @@ Get help: [Post in our discussion board](https://github.com/orgs/skills/discussi
 &copy; 2023 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
 
 </footer>
+
